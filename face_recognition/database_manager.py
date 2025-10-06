@@ -27,7 +27,11 @@ class ChromaDBManager:
     def find_user_by_username(self, username: str):
         """Finds a user by their username using metadata filtering."""
         result = self.collection.get(where={"username": username})
-        return result if result['ids'] else None
+        # Return the full result object only if a user was found.
+        # The service layer can then reliably access keys like 'ids' and 'metadatas'.
+        if result and result.get('ids'):
+            return result
+        return None
 
     def search_for_face(self, embedding: np.ndarray, top_k: int = 1):
         """Searches for the closest matching face in the database."""
